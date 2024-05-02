@@ -9,15 +9,30 @@ import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
 
+import telran.time.BarMizvaAdjuster;
+
 class DateTimeTest {
 
 	@Test
-	void introductionTest() {
-		LocalDateTime d1 = LocalDateTime.parse("1990-01-30T00:00:00");
-		LocalDateTime d2 = LocalDateTime.parse("2000-10-20T00:00:00");
-		ChronoUnit unit = ChronoUnit.SECONDS;
-		System.out.printf("difference between %s and %s in %s is %d",
-				d2, d1, unit, unit.between(d2, d1));
+	void barMizvaAdjusterTest() {
+		LocalDate birthDate = LocalDate.parse("1799-06-06");
+		LocalDate expected = LocalDate.of(1812, 6, 6);
+		assertEquals(expected, birthDate.with(new BarMizvaAdjuster()));
+	}
+	@Test
+	void nextFriday13Test() {
+		//TODO
+	}
+	@Test
+	void friday13RangeTest() {
+		//TODO
+	}
+	@Test
+	void zonedDateTimeTest() {
+		var availableTimeZones = ZoneId.getAvailableZoneIds();
+		for(String zone: availableTimeZones) {
+			System.out.println(zone);
+		}
 	}
 	
 
