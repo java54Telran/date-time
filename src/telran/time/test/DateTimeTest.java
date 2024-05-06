@@ -44,8 +44,8 @@ class DateTimeTest {
 	@Test
 	void friday13RangeTest() {
 		Temporal from = ld;
-		Temporal to = LocalDateTime.of(2024, 12, 31, 0,0);
-		LocalDate test = LocalDate.from(to);
+		Temporal to = ZonedDateTime.of(2025, 3, 31, 0, 0,0,0, ZoneId.systemDefault());
+		
 		Friday13Range range = Friday13Range.getRange(from, to);
 		Temporal [] expectedArray = {
 				LocalDate.of(2024, 9, 13),
