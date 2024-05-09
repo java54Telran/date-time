@@ -6,6 +6,7 @@ import java.time.Month;
 import java.time.YearMonth;
 import java.time.format.TextStyle;
 import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 
 record MonthYear(int month, int year) {
@@ -15,16 +16,42 @@ public class PrintCalendar {
 
 	private static final int TITLE_OFFSET = 5;
 	private static final int COLUMN_WIDTH = 4;
-	private static DayOfWeek[] weekDays = DayOfWeek.values();
+	private static DayOfWeek[] weekDays;
 	public static void main(String[] args)  {
 		try {
 			MonthYear monthYear = getMonthYear(args);
+			weekDays = getWeekDays(args);
 			printCalendar(monthYear);
 		} catch (RuntimeException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
+	}
+
+	private static DayOfWeek[] getWeekDays(String[] args) throws Exception {
+		DayOfWeek startWeekDay = args.length < 3 ? DayOfWeek.of(1) : getStartWeekDay(args[2]);
+		return startWeekDay.getValue() == 1 ? DayOfWeek.values() : getWeekDays(startWeekDay);
+	}
+
+	private static DayOfWeek[] getWeekDays(DayOfWeek startWeekDay) {
+		int nWeekDays = DayOfWeek.values().length;
+		DayOfWeek [] res = new DayOfWeek[nWeekDays];
+		res[0] = startWeekDay;
+		for(int i = 0; i < nWeekDays; i++) {
+			res[i] = startWeekDay.plus(i);
+		}
+		return res;
+	}
+
+	private static DayOfWeek getStartWeekDay(String dayStr) throws Exception{
+		try {
+			DayOfWeek res = DayOfWeek.valueOf(dayStr.toUpperCase());
+			return res;
+		} catch (Exception e) {
+			throw new Exception("start week day must be an English full week day name");
+		}
+		
 	}
 
 	private static  MonthYear getMonthYear(String[] args) throws Exception{
@@ -104,13 +131,20 @@ public class PrintCalendar {
 
 	private static int getFirstOffset(int currentWeekDay) {
 		
-		return COLUMN_WIDTH * (currentWeekDay - 1);
+		return COLUMN_WIDTH * (currentWeekDay - 1 );
 	}
 
 	private static int getFirstDayOfMonth(MonthYear monthYear) {
 		LocalDate ld = LocalDate.of(monthYear.year(), monthYear.month(),
 				1);
-		return ld.get(ChronoField.DAY_OF_WEEK);
+		int delta = getStartDaysDelta(weekDays[0], DayOfWeek.values()[0]);
+		int res = ld.getDayOfWeek().plus(delta).getValue();
+		return res;
+	}
+
+	private static int getStartDaysDelta(DayOfWeek customStartDay, DayOfWeek originalStartDay) {
+		
+		return 7 - (customStartDay.getValue() - originalStartDay.getValue());
 	}
 
 	private static int getDaysInMonth(MonthYear monthYear) {
